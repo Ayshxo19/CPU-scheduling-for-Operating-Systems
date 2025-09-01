@@ -1,0 +1,61 @@
+#include <iostream>
+#include <algorithm>
+using namespace std;
+
+struct Process {
+    int pid;      // Process ID
+    int burstTime;// Burst Time
+    int priority; // Priority (higher number means higher priority)
+    int waitingTime;
+    int turnaroundTime;
+};
+
+// Function to sort processes by priority (higher priority first)
+bool comparePriority(Process a, Process b) {
+    return a.priority > b.priority;
+}
+
+int main() {
+    int n;
+    cout << "Enter number of processes: ";
+    cin >> n;
+
+    Process proc[n];
+    
+    for (int i = 0; i < n; i++) {
+        proc[i].pid = i + 1;
+        cout << "Enter burst time for process " << proc[i].pid << ": ";
+        cin >> proc[i].burstTime;
+        cout << "Enter priority for process " << proc[i].pid << " (higher number = higher priority): ";
+        cin >> proc[i].priority;
+    }
+
+    // Sort processes by priority
+    sort(proc, proc + n, comparePriority);
+
+    // Calculate waiting time and turnaround time
+    proc[0].waitingTime = 0;
+    proc[0].turnaroundTime = proc[0].burstTime;
+
+    for (int i = 1; i < n; i++) {
+        proc[i].waitingTime = proc[i - 1].waitingTime + proc[i - 1].burstTime;
+        proc[i].turnaroundTime = proc[i].waitingTime + proc[i].burstTime;
+    }
+
+    // Display process info
+    cout << "\nProcess\tPriority\tBurst Time\tWaiting Time\tTurnaround Time\n";
+    int totalWaitingTime = 0, totalTurnaroundTime = 0;
+    for (int i = 0; i < n; i++) {
+        cout << "P" << proc[i].pid << "\t" << proc[i].priority << "\t\t" 
+             << proc[i].burstTime << "\t\t" << proc[i].waitingTime << "\t\t" 
+             << proc[i].turnaroundTime << "\n";
+        totalWaitingTime += proc[i].waitingTime;
+        totalTurnaroundTime += proc[i].turnaroundTime;
+    }
+
+    cout << "\nAverage Waiting Time: " << (float)totalWaitingTime / n;
+    cout << "\nAverage Turnaround Time: " << (float)totalTurnaroundTime / n << endl;
+
+    return 0;
+}
+
